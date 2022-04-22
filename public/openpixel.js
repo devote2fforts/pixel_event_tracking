@@ -212,12 +212,17 @@ var Url = /*#__PURE__*/function () {
     value: // http://stackoverflow.com/a/901144/1231563
     function getParameterByName(name, url) {
       if (!url) url = window.location.href;
-      name = name.replace(/[\[\]]/g, "\\$&");
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
+      name = name.replace(/[\[\]]/g, '\\$&');
+      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)', 'i'),
           results = regex.exec(url);
       if (!results) return null;
       if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+  }, {
+    key: "telNumber",
+    value: function telNumber(link) {
+      return link.href.includes('tel:') ? link.href.replace('tel:', '') : null;
     }
   }, {
     key: "externalHost",
@@ -437,10 +442,24 @@ window.onload = function () {
 
   for (var i = 0, l = aTags.length; i < l; i++) {
     aTags[i].addEventListener('click', function (_e) {
+      var _this2 = this;
+
+      Config.params = {};
+
       if (Url.externalHost(this)) {
         Config.externalHost = {
           link: this.href,
           time: Helper.now()
+        };
+      } else if (Url.telNumber(this)) Config.params = {
+        tel: function tel() {
+          return Url.telNumber(_this2);
+        }
+      };else {
+        Config.params = {
+          link: function link() {
+            return _this2.href;
+          }
         };
       }
 
@@ -448,10 +467,32 @@ window.onload = function () {
     }.bind(aTags[i]));
   }
 
+  var submit = document.querySelectorAll('form');
+
+  for (var i = 0, l = submit.length; i < l; i++) {
+    console.log(submit[i]);
+    submit[i].addEventListener('submit', function (_e) {
+      _e.preventDefault();
+      alert(1);
+    });
+  }
+
+  var submitbyn = document.querySelectorAll('input[type=submit]');
+  for (var i = 0, l = submitbyn.length; i < l; i++) {
+    submitbyn[i].addEventListener('submit', function (_e) {
+      _e.preventDefault();
+      alert(1);
+    });
+    submitbyn[i].addEventListener('click', function (_e) {
+      _e.preventDefault();
+      alert(1);
+    });
+  }
   var dataAttributes = document.querySelectorAll('[data-opix-event]');
 
   for (var i = 0, l = dataAttributes.length; i < l; i++) {
     dataAttributes[i].addEventListener('click', function (_e) {
+      Config.params = {};
       var event = this.getAttribute('data-opix-event');
 
       if (event) {
@@ -460,4 +501,4 @@ window.onload = function () {
     }.bind(dataAttributes[i]));
   }
 };
-}(window, document, window["opix"], "opix", "http://localhost:8080/openpixel", 1));
+}(window, document, window["opix"], "opix", "/openpixel", 1));

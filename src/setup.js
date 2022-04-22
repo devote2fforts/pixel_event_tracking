@@ -56,9 +56,15 @@ window.onload = function () {
     aTags[i].addEventListener(
       'click',
       function (_e) {
+        Config.params = {};
         if (Url.externalHost(this)) {
           Config.externalHost = { link: this.href, time: Helper.now() };
+        } else if (Url.telNumber(this))
+          Config.params = { tel: () => Url.telNumber(this) };
+        else {
+          Config.params = { link: () => this.href };
         }
+
         new Pixel(
           'a_tag_click',
           Helper.now(),
@@ -68,11 +74,28 @@ window.onload = function () {
     );
   }
 
+  var submit = document.querySelectorAll('input[type=submit]');
+  for (var i = 0, l = submit.length; i < l; i++) {
+    submit[i].addEventListener(
+      'click',
+      function (_e) {
+        Config.params = {};
+        console.log(this.form);
+        new Pixel(
+          'submit_click',
+          Helper.now(),
+          this.getAttribute('data-OPIX_FUNC-data')
+        );
+      }.bind(submit[i])
+    );
+  }
+
   var dataAttributes = document.querySelectorAll('[data-OPIX_FUNC-event]');
   for (var i = 0, l = dataAttributes.length; i < l; i++) {
     dataAttributes[i].addEventListener(
       'click',
       function (_e) {
+        Config.params = {};
         var event = this.getAttribute('data-OPIX_FUNC-event');
         if (event) {
           new Pixel(
