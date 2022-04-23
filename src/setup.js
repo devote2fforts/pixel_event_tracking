@@ -51,6 +51,12 @@ window.addEventListener(pageCloseEvent, function () {
 });
 
 window.onload = function () {
+  Config.submit = '';
+  if (Config.submit) {
+    new Pixel('form_submit', Helper.now(), function () {
+      return Config.submit;
+    });
+  }
   var aTags = document.getElementsByTagName('a');
   for (var i = 0, l = aTags.length; i < l; i++) {
     aTags[i].addEventListener(
@@ -71,22 +77,6 @@ window.onload = function () {
           this.getAttribute('data-OPIX_FUNC-data')
         );
       }.bind(aTags[i])
-    );
-  }
-
-  var submit = document.querySelectorAll('input[type=submit]');
-  for (var i = 0, l = submit.length; i < l; i++) {
-    submit[i].addEventListener(
-      'click',
-      function (_e) {
-        Config.params = {};
-        console.log(this.form);
-        new Pixel(
-          'submit_click',
-          Helper.now(),
-          this.getAttribute('data-OPIX_FUNC-data')
-        );
-      }.bind(submit[i])
     );
   }
 

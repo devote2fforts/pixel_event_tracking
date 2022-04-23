@@ -16,6 +16,7 @@
     "gulp-inject-string": "^1.1.2",
     "gulp-rename": "^2.0.0",
     "gulp-uglify": "^3.0.2",
+    "multer": "^1.4.4",
     "natives": "^1.1.6",
     "nodemon": "^2.0.15",
     "path": "^0.12.7"
