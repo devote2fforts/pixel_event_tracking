@@ -452,18 +452,24 @@ window.onload = function () {
     aTags[i].addEventListener('click', function (_e) {
       var _this2 = this;
 
+      var event_type = '';
       Config.params = {};
 
       if (Url.externalHost(this)) {
+        event_type = 'a_tag_click';
         Config.externalHost = {
           link: this.href,
           time: Helper.now()
         };
-      } else if (Url.telNumber(this)) Config.params = {
-        tel: function tel() {
-          return Url.telNumber(_this2);
-        }
-      };else {
+      } else if (Url.telNumber(this)) {
+        event_type = 'phone_number_click';
+        Config.params = {
+          tel: function tel() {
+            return Url.telNumber(_this2);
+          }
+        };
+      } else {
+        event_type = 'external_link_click';
         Config.params = {
           link: function link() {
             return _this2.href;
@@ -471,7 +477,7 @@ window.onload = function () {
         };
       }
 
-      new Pixel('a_tag_click', Helper.now(), this.getAttribute('data-opix-data'));
+      new Pixel(event_type, Helper.now(), this.getAttribute('data-opix-data'));
     }.bind(aTags[i]));
   }
 
@@ -488,4 +494,4 @@ window.onload = function () {
     }.bind(dataAttributes[i]));
   }
 };
-}(window, document, window["opix"], "opix", "/openpixel", 1));
+}(window, document, window["opix"], "opix", "http://localhost:8080/openpixel", 1));

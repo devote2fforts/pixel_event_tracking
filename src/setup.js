@@ -62,17 +62,21 @@ window.onload = function () {
     aTags[i].addEventListener(
       'click',
       function (_e) {
+        let event_type = '';
         Config.params = {};
         if (Url.externalHost(this)) {
+          event_type = 'a_tag_click';
           Config.externalHost = { link: this.href, time: Helper.now() };
-        } else if (Url.telNumber(this))
+        } else if (Url.telNumber(this)) {
+          event_type = 'phone_number_click';
           Config.params = { tel: () => Url.telNumber(this) };
-        else {
+        } else {
+          event_type = 'external_link_click';
           Config.params = { link: () => this.href };
         }
 
         new Pixel(
-          'a_tag_click',
+          event_type,
           Helper.now(),
           this.getAttribute('data-OPIX_FUNC-data')
         );
