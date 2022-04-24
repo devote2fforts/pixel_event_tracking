@@ -212,12 +212,17 @@ var Url = /*#__PURE__*/function () {
     value: // http://stackoverflow.com/a/901144/1231563
     function getParameterByName(name, url) {
       if (!url) url = window.location.href;
-      name = name.replace(/[\[\]]/g, "\\$&");
-      var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
+      name = name.replace(/[\[\]]/g, '\\$&');
+      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)', 'i'),
           results = regex.exec(url);
       if (!results) return null;
       if (!results[2]) return '';
-      return decodeURIComponent(results[2].replace(/\+/g, " "));
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+  }, {
+    key: "telNumber",
+    value: function telNumber(link) {
+      return link.href.includes('tel:') ? link.href.replace('tel:', '') : null;
     }
   }, {
     key: "externalHost",
@@ -433,18 +438,46 @@ window.addEventListener(pageCloseEvent, function () {
 });
 
 window.onload = function () {
+  Config.submit = '';
+
+  if (Config.submit) {
+    new Pixel('form_submit', Helper.now(), function () {
+      return Config.submit;
+    });
+  }
+
   var aTags = document.getElementsByTagName('a');
 
   for (var i = 0, l = aTags.length; i < l; i++) {
     aTags[i].addEventListener('click', function (_e) {
+      var _this2 = this;
+
+      var event_type = '';
+      Config.params = {};
+
       if (Url.externalHost(this)) {
+        event_type = 'a_tag_click';
         Config.externalHost = {
           link: this.href,
           time: Helper.now()
         };
+      } else if (Url.telNumber(this)) {
+        event_type = 'phone_number_click';
+        Config.params = {
+          tel: function tel() {
+            return Url.telNumber(_this2);
+          }
+        };
+      } else {
+        event_type = 'external_link_click';
+        Config.params = {
+          link: function link() {
+            return _this2.href;
+          }
+        };
       }
 
-      new Pixel('a_tag_click', Helper.now(), this.getAttribute('data-opix-data'));
+      new Pixel(event_type, Helper.now(), this.getAttribute('data-opix-data'));
     }.bind(aTags[i]));
   }
 
@@ -452,6 +485,7 @@ window.onload = function () {
 
   for (var i = 0, l = dataAttributes.length; i < l; i++) {
     dataAttributes[i].addEventListener('click', function (_e) {
+      Config.params = {};
       var event = this.getAttribute('data-opix-event');
 
       if (event) {

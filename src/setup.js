@@ -51,16 +51,32 @@ window.addEventListener(pageCloseEvent, function () {
 });
 
 window.onload = function () {
+  Config.submit = '';
+  if (Config.submit) {
+    new Pixel('form_submit', Helper.now(), function () {
+      return Config.submit;
+    });
+  }
   var aTags = document.getElementsByTagName('a');
   for (var i = 0, l = aTags.length; i < l; i++) {
     aTags[i].addEventListener(
       'click',
       function (_e) {
+        let event_type = '';
+        Config.params = {};
         if (Url.externalHost(this)) {
+          event_type = 'a_tag_click';
           Config.externalHost = { link: this.href, time: Helper.now() };
+        } else if (Url.telNumber(this)) {
+          event_type = 'phone_number_click';
+          Config.params = { tel: () => Url.telNumber(this) };
+        } else {
+          event_type = 'external_link_click';
+          Config.params = { link: () => this.href };
         }
+
         new Pixel(
-          'a_tag_click',
+          event_type,
           Helper.now(),
           this.getAttribute('data-OPIX_FUNC-data')
         );
@@ -73,6 +89,7 @@ window.onload = function () {
     dataAttributes[i].addEventListener(
       'click',
       function (_e) {
+        Config.params = {};
         var event = this.getAttribute('data-OPIX_FUNC-event');
         if (event) {
           new Pixel(
