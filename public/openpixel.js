@@ -494,4 +494,4 @@ window.onload = function () {
     }.bind(dataAttributes[i]));
   }
 };
-}(window, document, window["opix"], "opix", "http://localhost:8080/openpixel", 1));
+}(window, document, window["opix"], "opix", "https://pxl.gpmreports.com", 1));
